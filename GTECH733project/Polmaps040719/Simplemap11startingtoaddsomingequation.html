@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="google-site-verification" content="wHMbt8j8hfgb0Kd51ApjknGKj2IU_Sn1NR-MRBr5gJs" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>My Map</title>
+	<!--Leaflet-->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+
+	<script src="data/testsimplemap.geojson"></script>
+
+
+	<script src="./lib/js/leaflet-gplaces-autocomplete.js"></script>
+
+	<link rel="stylesheet" href="./lib/css/leaflet-gplaces-autocomplete.css" />
+
+	<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyA2f2jX-ViOOCrURi3W8m3pz4QM23yg_bw"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+	<style type="text/css">
+		#map {
+			height: 400px;
+		}
+
+		#results {
+			height: 35%;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-around;
+		}
+
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255, 255, 255, 0.8);
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			border-radius: 5px;
+		}
+
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+	</style>
+</head>
+
+<body>
+	<h1></h1>
+	<div id="map"></div>
+
+
+	<script>
+	function getStSenDistColor(StSenDist){
+		if(StSenDist == 10){
+			return 'rgb(166,206,227)';
+		}else if(StSenDist == 11){
+			return'rgb(31,120,180)';
+		}else if(StSenDist == 12){
+			return'rgb(178,223,138)';
+		}else if(StSenDist == 13){
+			return'rgb(51,160,44)';
+		}else if(StSenDist == 14){
+			return'rgb(251,154,153)';
+		}else if(StSenDist == 15){
+			return'rgb(227,26,28)';
+		}else if(StSenDist == 16){
+			return'rgb(253,191,111)';
+		}else if(StSenDist == 17){
+			return'rgb(255,127,0)';
+		}else if(StSenDist == 18){
+			return'rgb(202,178,214)';
+		}else if(StSenDist == 19){
+			return'rgb(106,61,154)';
+		}else if(StSenDist == 20){
+			return'rgb(255,255,153)';
+		}else if(StSenDist== 21){
+			return'rgb(177,89,40)';
+		}else if(StSenDist == 22){
+			return'rgb(166,206,227)';
+		}else if(StSenDist == 23){
+			return'rgb(31,120,180)';
+		}else if(StSenDist == 24){
+			return'rgb(178,223,138)';
+		}else if(StSenDist == 25){
+			return'rgb(51,160,44)';
+		}else if(StSenDist == 26){
+			return'rgb(251,154,153)';
+		}else if(StSenDist == 27){
+			return'rgb(202,178,214)';
+		}else if(StSenDist == 28){
+			return'rgb(106,61,154)';
+		}else if(StSenDist == 29){
+			return'rgb(255,255,153)';
+		}else if(StSenDist== 30){
+			return'rgb(177,89,40)';
+		}else if(StSenDist == 31){
+			return'rgb(166,206,227)';
+		}else if(StSenDist == 32){
+			return'rgb(31,120,180)';
+		}else if(StSenDist == 33){
+			return'rgb(178,223,138)';
+		}else if(StSenDist == 34){
+			return'rgb(51,160,44)';
+		}else if(StSenDist == 35){
+			return'rgb(251,154,153)';
+		}else if(StSenDist == 36){
+			return'rgb(251,154,153)';
+					}else{
+			return'black';
+		}
+	}
+
+	function StSenDistStyle(feature){
+		return{
+			fillColor:getStSenDistColor(feature.properties.StSenDist),
+			weight:1,
+			color:'white',
+		}
+	}
+
+
+
+	function getCongDistColor(CongDist){
+		if(CongDist == 1){
+			return 'rgb(166,206,227)';
+		}else if(CongDist == 2){
+			return'rgb(31,120,180)';
+		}else if(CongDist == 3){
+			return'rgb(178,223,138)';
+		}else if(CongDist == 4){
+			return'rgb(51,160,44)';
+		}else if(CongDist == 5){
+			return'rgb(251,154,153)';
+		}else if(CongDist == 6){
+			return'rgb(227,26,28)';
+		}else if(CongDist == 7){
+			return'rgb(253,191,111)';
+		}else if(CongDist == 8){
+			return'rgb(255,127,0)';
+		}else if(CongDist == 9){
+			return'rgb(202,178,214)';
+		}else if(CongDist == 10){
+			return'rgb(106,61,154)';
+		}else if(CongDist == 11){
+			return'rgb(255,255,153)';
+		}else if(CongDist == 12){
+			return'rgb(177,89,40)';
+		}else if(CongDist == 13){
+			return'rgb(166,206,227)';
+		}else if(CongDist == 14){
+			return'rgb(31,120,180)';
+		}else if(CongDist == 15){
+			return'rgb(178,223,138)';
+		}else if(CongDist == 16){
+			return'rgb(51,160,44)';
+		}else if(CongDist == 17){
+			return'rgb(251,154,153)';
+					}else{
+			return'black';
+		}
+	}
+
+	function CongDistStyle(feature){
+		return{
+			fillColor:getCongDistColor(feature.properties.CongDist),
+			weight:1,
+			color:'white',
+		}
+	}
+
+
+	function getBoroCDColor(BoroCD){
+		if(BoroCD == 101){
+			return 'rgb(166,206,227)';
+		}else if(BoroCD == 102){
+			return'rgb(31,120,180)';
+		}else if(BoroCD == 103){
+			return'rgb(178,223,138)';
+		}else if(BoroCD == 104){
+			return'rgb(51,160,44)';
+		}else if(BoroCD == 105){
+			return'rgb(251,154,153)';
+		}else if(BoroCD == 106){
+			return'rgb(227,26,28)';
+		}else if(BoroCD == 107){
+			return'rgb(253,191,111)';
+		}else if(BoroCD == 108){
+			return'rgb(255,127,0)';
+		}else if(BoroCD == 109){
+			return'rgb(202,178,214)';
+		}else if(BoroCD == 110){
+			return'rgb(106,61,154)';
+		}else if(BoroCD == 111){
+			return'rgb(255,255,153)';
+		}else if(BoroCD == 112){
+			return'rgb(177,89,40)';
+		}else if(BoroCD == 315){
+			return'rgb(166,206,227)';
+		}else if(BoroCD == 314){
+			return'rgb(31,120,180)';
+		}else if(BoroCD == 313){
+			return'rgb(178,223,138)';
+		}else if(BoroCD == 312){
+			return'rgb(51,160,44)';
+		}else if(BoroCD == 311){
+			return'rgb(251,154,153)';
+		}else if(BoroCD == 212){
+			return'rgb(227,26,28)';
+		}else if(BoroCD == 211){
+			return'rgb(253,191,111)';
+		}else if(BoroCD == 210){
+			return'rgb(255,127,0)';
+		}else if(BoroCD == 201){
+			return'rgb(202,178,214)';
+		}else if(BoroCD == 202){
+			return'rgb(106,61,154)';
+		}else if(BoroCD == 203){
+			return'rgb(255,255,153)';
+		}else if(BoroCD == 204){
+			return'rgb(177,89,40)';
+		}else if(BoroCD == 205){
+			return'rgb(166,206,227)';
+		}else if(BoroCD == 206){
+			return'rgb(31,120,180)';
+		}else if(BoroCD == 207){
+			return'rgb(178,223,138)';
+		}else if(BoroCD == 208){
+			return'rgb(51,160,44)';
+		}else if(BoroCD == 209){
+			return'rgb(251,154,153)';
+		}else if(BoroCD == 310){
+			return'rgb(227,26,28)';
+		}else if(BoroCD == 301){
+			return'rgb(253,191,111)';
+		}else if(BoroCD == 302){
+			return'rgb(255,127,0)';
+		}else if(BoroCD == 303){
+			return'rgb(202,178,214)';
+		}else if(BoroCD == 304){
+			return'rgb(106,61,154)';
+		}else if(BoroCD == 305){
+			return'rgb(255,255,153)';
+		}else if(BoroCD == 306){
+			return'rgb(177,89,40)';
+		}else if(BoroCD == 307){
+			return'rgb(166,206,227)';
+		}else if(BoroCD == 308){
+			return'rgb(31,120,180)';
+		}else if(BoroCD == 309){
+			return'rgb(178,223,138)';
+		}else if(BoroCD == 410){
+			return'rgb(51,160,44)';
+		}else if(BoroCD == 401){
+			return'rgb(251,154,153)';
+		}else if(BoroCD == 402){
+			return'rgb(227,26,28)';
+		}else if(BoroCD == 403){
+			return'rgb(253,191,111)';
+		}else if(BoroCD == 404){
+			return'rgb(255,127,0)';
+		}else if(BoroCD == 405){
+			return'rgb(202,178,214)';
+		}else if(BoroCD == 406){
+			return'rgb(253,191,111)';
+		}else if(BoroCD == 407){
+			return'rgb(106,61,154)';
+		}else if(BoroCD == 408){
+			return'rgb(255,255,153)';
+		}else if(BoroCD == 318){
+			return'rgb(177,89,40)';
+		}else if(BoroCD == 317){
+			return'rgb(166,206,227)';
+		}else if(BoroCD == 316){
+			return'rgb(253,191,111)';
+		}else if(BoroCD == 409){
+			return'rgb(106,61,154)';
+		}else if(BoroCD == 410){
+			return'rgb(255,255,153)';
+		}else if(BoroCD == 411){
+			return'rgb(177,89,40)';
+		}else if(BoroCD == 412){
+			return'rgb(166,206,227)';
+		}else if(BoroCD == 413){
+			return'rgb(177,89,40)';
+		}else if(BoroCD == 414){
+			return'rgb(166,206,227)';
+		}else if(BoroCD == 501){
+			return'rgb(253,191,111)';
+		}else if(BoroCD == 502){
+			return'rgb(106,61,154)';
+		}else if(BoroCD == 503){
+			}else{
+			return'black';
+		}
+	}
+
+	function BoroCDStyle(feature){
+		return{
+			fillColor:getBoroCDColor(feature.properties.BoroCD),
+			weight:1,
+			color:'white',
+		}
+	}
+
+
+	function getCounDistColor(CounDist){
+		if(CounDist == 1){
+			return 'rgb(166,206,227)';
+		}else if(CounDist == 2){
+			return'rgb(31,120,180)';
+		}else if(CounDist == 3){
+			return'rgb(178,223,138)';
+		}else if(CounDist == 4){
+			return'rgb(51,160,44)';
+		}else if(CounDist == 5){
+			return'rgb(251,154,153)';
+		}else if(CounDist == 6){
+			return'rgb(227,26,28)';
+		}else if(CounDist == 7){
+			return'rgb(253,191,111)';
+		}else if(CounDist == 8){
+			return'rgb(255,127,0)';
+		}else if(CounDist == 9){
+			return'rgb(202,178,214)';
+		}else if(CounDist == 10){
+			return'rgb(106,61,154)';
+		}else if(CounDist == 11){
+			return'rgb(255,255,153)';
+		}else if(CounDist == 12){
+			return'rgb(177,89,40)';
+		}else if(CounDist == 13){
+			return'rgb(166,206,227)';
+		}else if(CounDist == 14){
+			return'rgb(31,120,180)';
+		}else if(CounDist == 15){
+			return'rgb(178,223,138)';
+		}else if(CounDist == 16){
+			return'rgb(51,160,44)';
+		}else if(CounDist == 17){
+			return'rgb(251,154,153)';
+		}else if(CounDist == 18){
+			return'rgb(227,26,28)';
+		}else if(CounDist == 19){
+			return'rgb(253,191,111)';
+		}else if(CounDist == 20){
+			return'rgb(255,127,0)';
+		}else if(CounDist == 21){
+			return'rgb(202,178,214)';
+		}else if(CounDist == 22){
+			return'rgb(106,61,154)';
+		}else if(CounDist == 23){
+			return'rgb(255,255,153)';
+		}else if(CounDist == 24){
+			return'rgb(177,89,40)';
+		}else if(CounDist == 25){
+			return'rgb(166,206,227)';
+		}else if(CounDist == 26){
+			return'rgb(31,120,180)';
+		}else if(CounDist == 27){
+			return'rgb(178,223,138)';
+		}else if(CounDist == 28){
+			return'rgb(51,160,44)';
+		}else if(CounDist == 29){
+			return'rgb(251,154,153)';
+		}else if(CounDist == 30){
+			return'rgb(227,26,28)';
+		}else if(CounDist == 31){
+			return'rgb(253,191,111)';
+		}else if(CounDist == 32){
+			return'rgb(255,127,0)';
+		}else if(CounDist == 33){
+			return'rgb(202,178,214)';
+		}else if(CounDist == 34){
+			return'rgb(106,61,154)';
+		}else if(CounDist == 35){
+			return'rgb(255,255,153)';
+		}else if(CounDist == 36){
+			return'rgb(177,89,40)';
+		}else if(CounDist == 37){
+			return'rgb(166,206,227)';
+		}else if(CounDist == 38){
+			return'rgb(31,120,180)';
+		}else if(CounDist == 39){
+			return'rgb(178,223,138)';
+		}else if(CounDist == 40){
+			return'rgb(51,160,44)';
+		}else if(CounDist == 41){
+			return'rgb(251,154,153)';
+		}else if(CounDist == 42){
+			return'rgb(227,26,28)';
+		}else if(CounDist == 43){
+			return'rgb(253,191,111)';
+		}else if(CounDist == 44){
+			return'rgb(255,127,0)';
+		}else if(CounDist == 45){
+			return'rgb(202,178,214)';
+		}else if(CounDist == 46){
+			return'rgb(253,191,111)';
+		}else if(CounDist == 47){
+			return'rgb(106,61,154)';
+		}else if(CounDist == 48){
+			return'rgb(255,255,153)';
+		}else if(CounDist == 49){
+			return'rgb(177,89,40)';
+		}else if(CounDist == 50){
+			return'rgb(166,206,227)';
+		}else if(CounDist == 51){
+			return'rgb(253,191,111)';
+		}else{
+			return'black';
+		}
+	}
+
+	function CounDistStyle(feature){
+		return{
+			fillColor:getCounDistColor(feature.properties.CounDist),
+			weight:1,
+			color:'white',
+		}
+	}
+
+	function getBoroCodeColor(BoroCode){
+		if(BoroCode == 1){
+			return 'rgb(166,206,227)';
+		}else if(BoroCode == 2){
+			return'rgb(31,120,180)';
+		}else if(BoroCode == 3){
+			return'rgb(178,223,138)';
+		}else if(BoroCode == 4){
+			return'rgb(51,160,44)';
+		}else if(BoroCode == 5){
+			return'rgb(251,154,153)';
+				}else{
+			return'black';
+		}
+	}
+
+	function BoroCodeStyle(feature){
+		return{
+			fillColor:getBoroCodeColor(feature.properties.BoroCode),
+			weight:1,
+			color:'white',
+		}
+	}
+
+	function getADColor(AssemDist){
+		if(AssemDist == 22){
+			return 'rgb(166,206,227)';
+		}else if(AssemDist == 23){
+			return'rgb(31,120,180)';
+		}else if(AssemDist == 24){
+			return'rgb(178,223,138)';
+		}else if(AssemDist == 26){
+			return'rgb(51,160,44)';
+		}else if(AssemDist == 27){
+			return'rgb(251,154,153)';
+		}else if(AssemDist == 28){
+			return'rgb(227,26,28)';
+		}else if(AssemDist == 29){
+			return'rgb(253,191,111)';
+		}else if(AssemDist == 30){
+			return'rgb(255,127,0)';
+		}else if(AssemDist == 31){
+			return'rgb(202,178,214)';
+		}else if(AssemDist == 32){
+			return'rgb(106,61,154)';
+		}else if(AssemDist == 33){
+			return'rgb(255,255,153)';
+		}else if(AssemDist == 34){
+			return'rgb(177,89,40)';
+		}else if(AssemDist == 35){
+			return'rgb(166,206,227)';
+		}else if(AssemDist == 36){
+			return'rgb(31,120,180)';
+		}else if(AssemDist == 37){
+			return'rgb(178,223,138)';
+		}else if(AssemDist == 38){
+			return'rgb(51,160,44)';
+		}else if(AssemDist == 39){
+			return'rgb(251,154,153)';
+		}else if(AssemDist == 40){
+			return'rgb(227,26,28)';
+		}else if(AssemDist == 41){
+			return'rgb(253,191,111)';
+		}else if(AssemDist == 42){
+			return'rgb(255,127,0)';
+		}else if(AssemDist == 43){
+			return'rgb(202,178,214)';
+		}else if(AssemDist == 44){
+			return'rgb(106,61,154)';
+		}else if(AssemDist == 45){
+			return'rgb(255,255,153)';
+		}else if(AssemDist == 46){
+			return'rgb(177,89,40)';
+		}else if(AssemDist == 47){
+			return'rgb(166,206,227)';
+		}else if(AssemDist == 48){
+			return'rgb(31,120,180)';
+		}else if(AssemDist == 49){
+			return'rgb(178,223,138)';
+		}else if(AssemDist == 50){
+			return'rgb(51,160,44)';
+		}else if(AssemDist == 51){
+			return'rgb(251,154,153)';
+		}else if(AssemDist == 52){
+			return'rgb(227,26,28)';
+		}else if(AssemDist == 53){
+			return'rgb(253,191,111)';
+		}else if(AssemDist == 54){
+			return'rgb(255,127,0)';
+		}else if(AssemDist == 55){
+			return'rgb(202,178,214)';
+		}else if(AssemDist == 56){
+			return'rgb(106,61,154)';
+		}else if(AssemDist == 57){
+			return'rgb(255,255,153)';
+		}else if(AssemDist == 58){
+			return'rgb(177,89,40)';
+		}else if(AssemDist == 59){
+			return'rgb(166,206,227)';
+		}else if(AssemDist == 60){
+			return'rgb(31,120,180)';
+		}else if(AssemDist == 61){
+			return'rgb(178,223,138)';
+		}else if(AssemDist == 62){
+			return'rgb(51,160,44)';
+		}else if(AssemDist == 63){
+			return'rgb(251,154,153)';
+		}else if(AssemDist == 64){
+			return'rgb(227,26,28)';
+		}else if(AssemDist == 65){
+			return'rgb(253,191,111)';
+		}else if(AssemDist == 66){
+			return'rgb(255,127,0)';
+		}else if(AssemDist == 67){
+			return'rgb(202,178,214)';
+		}else if(AssemDist == 68){
+			return'rgb(253,191,111)';
+		}else if(AssemDist == 69){
+			return'rgb(106,61,154)';
+		}else if(AssemDist == 70){
+			return'rgb(255,255,153)';
+		}else if(AssemDist == 71){
+			return'rgb(177,89,40)';
+		}else if(AssemDist == 72){
+			return'rgb(166,206,227)';
+		}else if(AssemDist == 73){
+			return'rgb(31,120,180)';
+		}else if(AssemDist == 74){
+			return'rgb(178,223,138)';
+		}else if(AssemDist == 75){
+			return'rgb(51,160,44)';
+		}else if(AssemDist == 76){
+			return'rgb(251,154,153)';
+		}else if(AssemDist == 77){
+			return'rgb(227,26,28)';
+		}else if(AssemDist == 78){
+			return'rgb(253,191,111)';
+		}else if(AssemDist == 79){
+			return'rgb(255,127,0)';
+		}else if(AssemDist == 80){
+			return'rgb(202,178,214)';
+		}else if(AssemDist == 81){
+			return'rgb(106,61,154)';
+		}else if(AssemDist == 82){
+			return'rgb(255,255,153)';
+		}else if(AssemDist == 83){
+			return'rgb(177,89,40)';
+		}else if(AssemDist == 84){
+			return'rgb(166,206,227)';
+		}else if(AssemDist == 85){
+			return'rgb(31,120,180)';
+		}else if(AssemDist == 86){
+			return'rgb(178,223,138)';
+		}else if(AssemDist == 87){
+			return'rgb(253,191,111)';
+		}else{
+			return'black';
+		}
+	}
+
+	function ADStyle(feature){
+		return{
+			fillColor:getADColor(feature.properties.AssemDist),
+			weight:1,
+			color:'white',
+		}
+	}
+	var map=L.map('map').setView([40.732, -73.951], 12);
+	var ADLayer = L.geoJson(
+		district,
+		{style:ADStyle,
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup('<font size="2">'+feature.properties.Shape_1/+
+												'<font size= "2">' + '<strong><u>AssemDist:</u> </strong>' + feature.properties.AssemDist + '<p>' +
+												'<font size= "2">' + '<strong><u>CounDist:</u> </strong>' + feature.properties.CounDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCD:</u> </strong>' + feature.properties.BoroCD + '<p>' +
+												'<font size= "2">' + '<strong><u>CongDist:</u> </strong>' + feature.properties.CongDist + '<p>'+
+												'<font size= "2">' + '<strong><u>StSenDist:</u> </strong>' + feature.properties.StSenDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCode:</u> </strong>' + feature.properties.BoroCode + '<p>'
+											);
+			}
+		}
+		).addTo(map);
+	var BoroCodeLayer =L.geoJson(
+		district,
+		{style:BoroCodeStyle,
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup('<font size= "2">' + '<strong><u>AssemDist:</u> </strong>' + feature.properties.AssemDist + '<p>' +
+												'<font size= "2">' + '<strong><u>CounDist:</u> </strong>' + feature.properties.CounDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCD:</u> </strong>' + feature.properties.BoroCD + '<p>' +
+												'<font size= "2">' + '<strong><u>CongDist:</u> </strong>' + feature.properties.CongDist + '<p>'+
+												'<font size= "2">' + '<strong><u>StSenDist:</u> </strong>' + feature.properties.StSenDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCode:</u> </strong>' + feature.properties.BoroCode + '<p>'
+				);
+			}
+		}
+	).addTo(map);
+	var CounDistLayer = L.geoJson(
+		district,
+		{style:CounDistStyle,
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup('<font size= "2">' + '<strong><u>AssemDist:</u> </strong>' + feature.properties.AssemDist + '<p>' +
+												'<font size= "2">' + '<strong><u>CounDist:</u> </strong>' + feature.properties.CounDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCD:</u> </strong>' + feature.properties.BoroCD + '<p>' +
+												'<font size= "2">' + '<strong><u>CongDist:</u> </strong>' + feature.properties.CongDist + '<p>'+
+												'<font size= "2">' + '<strong><u>StSenDist:</u> </strong>' + feature.properties.StSenDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCode:</u> </strong>' + feature.properties.BoroCode + '<p>'
+				);
+			}
+		}
+	).addTo(map);
+	var BoroCDLayer = L.geoJson(
+		district,
+		{style:BoroCDStyle,
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup('<font size= "2">' + '<strong><u>AssemDist:</u> </strong>' + feature.properties.AssemDist + '<p>' +
+												'<font size= "2">' + '<strong><u>CounDist:</u> </strong>' + feature.properties.CounDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCD:</u> </strong>' + feature.properties.BoroCD + '<p>' +
+												'<font size= "2">' + '<strong><u>CongDist:</u> </strong>' + feature.properties.CongDist + '<p>'+
+												'<font size= "2">' + '<strong><u>StSenDist:</u> </strong>' + feature.properties.StSenDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCode:</u> </strong>' + feature.properties.BoroCode + '<p>'
+				);
+			}
+		}
+	) .addTo(map);
+	var CongDistLayer =L.geoJson(
+		district,
+		{style:CongDistStyle,
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup('<font size= "2">' + '<strong><u>AssemDist:</u> </strong>' + feature.properties.AssemDist + '<p>' +
+												'<font size= "2">' + '<strong><u>CounDist:</u> </strong>' + feature.properties.CounDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCD:</u> </strong>' + feature.properties.BoroCD + '<p>' +
+												'<font size= "2">' + '<strong><u>CongDist:</u> </strong>' + feature.properties.CongDist + '<p>'+
+												'<font size= "2">' + '<strong><u>StSenDist:</u> </strong>' + feature.properties.StSenDist + '<p>' +
+												'<font size= "2">' + '<strong><u>BoroCode:</u> </strong>' + feature.properties.BoroCode + '<p>'
+				);
+			}
+		}
+	).addTo(map);
+	var StSenDistLayer =L.geoJson(
+		district,
+		{style:StSenDistStyle,
+			onEachFeature: function (feature, layer) {
+			layer.bindPopup('<font size= "2">' + '<strong><u>AssemDist:</u> </strong>' + feature.properties.AssemDist + '<p>' +
+											'<font size= "2">' + '<strong><u>CounDist:</u> </strong>' + feature.properties.CounDist + '<p>' +
+											'<font size= "2">' + '<strong><u>BoroCD:</u> </strong>' + feature.properties.BoroCD + '<p>' +
+											'<font size= "2">' + '<strong><u>CongDist:</u> </strong>' + feature.properties.CongDist + '<p>'+
+											'<font size= "2">' + '<strong><u>StSenDist:</u> </strong>' + feature.properties.StSenDist + '<p>' +
+											'<font size= "2">' + '<strong><u>BoroCode:</u> </strong>' + feature.properties.BoroCode + '<p>'
+			);
+		}
+	}
+	).addTo(map);
+	var overlays = {
+			"Assemble Districts":ADLayer,
+			"Boro Presidents":BoroCodeLayer,
+			"City Council Districts":CounDistLayer,
+			"Community Districts":BoroCDLayer,
+			"Congrestional Districts":CongDistLayer,
+			"State Senate":StSenDistLayer
+	};
+	L.control.layers(overlays).addTo(map);
+	</script>
+</body>
+
+</html>
